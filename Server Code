@@ -1,0 +1,34 @@
+from anvil.tables import app_tables
+import anvil.tables.query as q
+import anvil.tables as tables
+import anvil.server
+import datetime
+import requests
+import json
+
+@anvil.server.callable
+def make_marine_request(port_id, ship_id):
+  response = requests.get(f"https://services.marinetraffic.com/en/api/etatoport/Enter your API key from MarineTraffic/portid:{port_id}/shipid:{ship_id}/protocol:jsono/msgtype:simple").json()[0]
+#   response = requests.get("http://www.json-generator.com/api/json/get/cebroRyyhu?indent=2").json()[0]
+  
+  app_tables.marine_test.add_row(
+    PORT_ID=port_id,
+    SHIP_ID=ship_id,
+    MMSI=response['MMSI'],
+    IMO=response['IMO'],
+    LAST_PORT=response['LAST_PORT'],
+    LAST_PORT_ID=response['LAST_PORT_ID'],
+    LAST_PORT_UNLOCODE=response['LAST_PORT_UNLOCODE'],
+    LAST_PORT_TIME=datetime.datetime.strptime(response['LAST_PORT_TIME'], "%Y-%m-%d %H:%M:%S"),
+    NEXT_PORT_NAME=response['NEXT_PORT_NAME'],
+    NEXT_PORT_UNLOCODE=response['NEXT_PORT_UNLOCODE'],
+    ETA_CALC=datetime.datetime.strptime(response['ETA_CALC'], "%Y-%m-%d %H:%M:%S"),
+    CREATED=datetime.datetime.utcnow()
+  )
+  
+  return response
+
+
+@anvil.server.callable
+def get_marine_api_records():
+  return app_tables.marine_test.search(tables.order_by("CREATED", ascending=False))
