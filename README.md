@@ -3,5 +3,6 @@ Sample API request for MarineTraffic.com using it with anvil.works. API key requ
 
 The code only applies for anvil.works. The web app is a query using ShipID and PortID to search for ETA to Port VI07. 
 
-![](capture.jpg)
 
+
+![](capture.jpg)
